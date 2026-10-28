@@ -1,0 +1,301 @@
+{
+  "engine": "pirescacs-fairy-1.5.0",
+  "variant": "pirescacs-v5",
+  "budgetMs": 10000,
+  "referenceProof": true,
+  "seconds": 0.29,
+  "passed": 24,
+  "total": 24,
+  "cases": [
+    {
+      "name": "arrival-now-white",
+      "fen": "5r2/2R5/8/8/8/8/8/8 w - - 0 1 v:0",
+      "kind": "win",
+      "proofPlies": 1,
+      "solutions": [
+        "c7c8"
+      ],
+      "best": "c7c8",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 2 multipv 1 score mate 1 nodes 245 nps 122500 tbhits 0 time 2 pv c7c8"
+    },
+    {
+      "name": "arrival-now-black",
+      "fen": "8/8/8/8/8/8/5r2/2R5 b - - 0 1 v:0",
+      "kind": "win",
+      "proofPlies": 1,
+      "solutions": [
+        "f2f1"
+      ],
+      "best": "f2f1",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 2 multipv 1 score mate 1 nodes 245 nps 122500 tbhits 0 time 2 pv f2f1"
+    },
+    {
+      "name": "arrival-swaps-chef-white",
+      "fen": "2C2r2/2R5/8/8/8/8/8/8 w - - 0 1 v:0",
+      "kind": "win",
+      "proofPlies": 1,
+      "solutions": [
+        "c7c8"
+      ],
+      "best": "c7c8",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 2 multipv 1 score mate 1 nodes 1225 nps 408333 tbhits 0 time 3 pv c7c8"
+    },
+    {
+      "name": "arrival-swaps-chef-black",
+      "fen": "8/8/8/8/8/8/5r2/2R2c2 b - - 0 1 v:0",
+      "kind": "win",
+      "proofPlies": 1,
+      "solutions": [
+        "f2f1"
+      ],
+      "best": "f2f1",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 2 multipv 1 score mate 1 nodes 1225 nps 408333 tbhits 0 time 3 pv f2f1"
+    },
+    {
+      "name": "arrival-while-captain-attacked-white",
+      "fen": "c4r2/2R5/8/8/8/8/8/K7 w - - 0 1 v:0",
+      "kind": "win",
+      "proofPlies": 1,
+      "solutions": [
+        "c7c8"
+      ],
+      "best": "c7c8",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 2 multipv 1 score mate 1 nodes 5390 nps 1078000 tbhits 0 time 5 pv c7c8"
+    },
+    {
+      "name": "arrival-while-captain-attacked-black",
+      "fen": "7k/8/8/8/8/8/5r2/2R4C b - - 0 1 v:0",
+      "kind": "win",
+      "proofPlies": 1,
+      "solutions": [
+        "f2f1"
+      ],
+      "best": "f2f1",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 2 multipv 1 score mate 1 nodes 5390 nps 1078000 tbhits 0 time 5 pv f2f1"
+    },
+    {
+      "name": "second-ship-wins-white",
+      "fen": "8/Rr5r/8/8/8/6p1/6R1/8 w - - 0 1 v:0",
+      "kind": "win",
+      "proofPlies": 1,
+      "solutions": [
+        "a7a8"
+      ],
+      "best": "a7a8",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 2 multipv 1 score mate 1 nodes 245 nps 122500 tbhits 0 time 2 pv a7a8"
+    },
+    {
+      "name": "second-ship-wins-black",
+      "fen": "8/1r6/1P6/8/8/8/R5Rr/8 b - - 0 1 v:0",
+      "kind": "win",
+      "proofPlies": 1,
+      "solutions": [
+        "h2h1"
+      ],
+      "best": "h2h1",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 2 multipv 1 score mate 1 nodes 245 nps 245000 tbhits 0 time 1 pv h2h1"
+    },
+    {
+      "name": "chef-must-block-white",
+      "fen": "8/8/8/8/8/8/R4r2/3C4 w - - 0 1 v:0",
+      "kind": "defense",
+      "proofPlies": 2,
+      "solutions": [
+        "d1f1"
+      ],
+      "best": "d1f1",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 2 multipv 1 score cp 0 nodes 6744 nps 1686000 tbhits 0 time 4 pv d1f1"
+    },
+    {
+      "name": "chef-must-block-black",
+      "fen": "4c3/2R4r/8/8/8/8/8/8 b - - 0 1 v:0",
+      "kind": "defense",
+      "proofPlies": 2,
+      "solutions": [
+        "e8c8"
+      ],
+      "best": "e8c8",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 2 multipv 1 score cp 0 nodes 6806 nps 1701500 tbhits 0 time 4 pv e8c8"
+    },
+    {
+      "name": "chef-removes-blocker-white",
+      "fen": "C1c3r1/2R5/8/8/8/8/8/8 w - - 0 1 v:0",
+      "kind": "win",
+      "proofPlies": 3,
+      "solutions": [
+        "a8c8"
+      ],
+      "best": "a8c8",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 4 multipv 1 score mate 2 nodes 4555 nps 1518333 tbhits 0 time 3 pv a8c8 g8g7 c7c8"
+    },
+    {
+      "name": "chef-removes-blocker-black",
+      "fen": "8/8/8/8/8/8/5r2/1R3C1c b - - 0 1 v:0",
+      "kind": "win",
+      "proofPlies": 3,
+      "solutions": [
+        "h1f1"
+      ],
+      "best": "h1f1",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 4 multipv 1 score mate 2 nodes 4555 nps 1518333 tbhits 0 time 3 pv h1f1 b1b2 f2f1"
+    },
+    {
+      "name": "doctor-revives-chef-to-clear-route-white",
+      "fen": "r1p2M2/2R5/8/8/8/8/8/8 w - - 0 1 v:0 r:C@e7",
+      "kind": "win",
+      "proofPlies": 5,
+      "solutions": [
+        "f8f8!"
+      ],
+      "best": "f8f8!",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 6 multipv 1 score mate 3 nodes 17863 nps 2232875 tbhits 0 time 8 pv f8f8! a8a7 f8c8 a7a6 c7c8"
+    },
+    {
+      "name": "doctor-revives-chef-to-clear-route-black",
+      "fen": "8/8/8/8/8/8/5r2/2m2P1R b - - 0 1 v:0 r:c@d2",
+      "kind": "win",
+      "proofPlies": 5,
+      "solutions": [
+        "c1c1!"
+      ],
+      "best": "c1c1!",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 6 multipv 1 score mate 3 nodes 17986 nps 1998444 tbhits 0 time 9 pv c1c1! h1h2 c1f1 h2h3 f2f1"
+    },
+    {
+      "name": "return-must-block-white",
+      "fen": "4c3/3P4/8/8/8/k7/R4r2/8 w - - 0 1 v:0",
+      "kind": "defense",
+      "proofPlies": 2,
+      "solutions": [
+        "d7d8@f1",
+        "d7e8@f1"
+      ],
+      "best": "d7e8@f1",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 7 multipv 1 score mate -3 nodes 138384 nps 2661230 tbhits 0 time 52 pv d7e8@f1 a3c1 a2a3 c1f1 a3a4 f2f1"
+    },
+    {
+      "name": "return-must-block-black",
+      "fen": "8/2R4r/7K/8/8/8/4p3/3C4 b - - 0 1 v:0",
+      "kind": "defense",
+      "proofPlies": 2,
+      "solutions": [
+        "e2d1@c8",
+        "e2e1@c8"
+      ],
+      "best": "e2d1@c8",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 7 multipv 1 score mate -3 nodes 137640 nps 2698823 tbhits 0 time 51 pv e2d1@c8 h6h3 h7h6 h3c8 h6h5 c7c8"
+    },
+    {
+      "name": "captain-must-block-white",
+      "fen": "8/8/8/8/8/8/1R3r2/K7 w - - 0 1 v:0",
+      "kind": "defense",
+      "proofPlies": 2,
+      "solutions": [
+        "a1f1"
+      ],
+      "best": "a1f1",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 2 multipv 1 score cp 0 nodes 6979 nps 1744750 tbhits 0 time 4 pv a1f1"
+    },
+    {
+      "name": "captain-must-block-black",
+      "fen": "7k/2R3r1/8/8/8/8/8/8 b - - 0 1 v:0",
+      "kind": "defense",
+      "proofPlies": 2,
+      "solutions": [
+        "h8c8"
+      ],
+      "best": "h8c8",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 2 multipv 1 score cp 0 nodes 6972 nps 1743000 tbhits 0 time 4 pv h8c8"
+    },
+    {
+      "name": "carpenter-must-block-white",
+      "fen": "8/8/8/8/8/8/R4r2/3N4 w - - 0 1 v:0",
+      "kind": "defense",
+      "proofPlies": 2,
+      "solutions": [
+        "d1f1"
+      ],
+      "best": "d1f1",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 2 multipv 1 score cp 0 nodes 4071 nps 1357000 tbhits 0 time 3 pv d1f1"
+    },
+    {
+      "name": "carpenter-must-block-black",
+      "fen": "4n3/2R4r/8/8/8/8/8/8 b - - 0 1 v:0",
+      "kind": "defense",
+      "proofPlies": 2,
+      "solutions": [
+        "e8c8"
+      ],
+      "best": "e8c8",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 2 multipv 1 score cp 0 nodes 4126 nps 1375333 tbhits 0 time 3 pv e8c8"
+    },
+    {
+      "name": "musician-must-block-white",
+      "fen": "8/8/8/1B6/8/8/R4r2/8 w - - 0 1 v:0",
+      "kind": "defense",
+      "proofPlies": 2,
+      "solutions": [
+        "b5f1"
+      ],
+      "best": "b5f1",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 2 multipv 1 score cp 0 nodes 4491 nps 1497000 tbhits 0 time 3 pv b5f1"
+    },
+    {
+      "name": "musician-must-block-black",
+      "fen": "8/2R4r/8/8/6b1/8/8/8 b - - 0 1 v:0",
+      "kind": "defense",
+      "proofPlies": 2,
+      "solutions": [
+        "g4c8"
+      ],
+      "best": "g4c8",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 2 multipv 1 score cp 0 nodes 4501 nps 1500333 tbhits 0 time 3 pv g4c8"
+    },
+    {
+      "name": "sail-five-plies-white",
+      "fen": "5r2/8/8/2R5/8/8/8/8 w - - 0 1 v:0",
+      "kind": "win",
+      "proofPlies": 5,
+      "solutions": [
+        "c5c6"
+      ],
+      "best": "c5c6",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 6 multipv 1 score mate 3 nodes 1219 nps 609500 tbhits 0 time 2 pv c5c6 f8f7 c6c7 f7f6 c7c8"
+    },
+    {
+      "name": "sail-five-plies-black",
+      "fen": "8/8/8/8/5r2/8/8/2R5 b - - 0 1 v:0",
+      "kind": "win",
+      "proofPlies": 5,
+      "solutions": [
+        "f4f3"
+      ],
+      "best": "f4f3",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 6 multipv 1 score mate 3 nodes 1219 nps 609500 tbhits 0 time 2 pv f4f3 c1c2 f3f2 c2c3 f2f1"
+    }
+  ]
+}

@@ -1,0 +1,633 @@
+{
+  "cases": 120,
+  "seconds": 18.63,
+  "unsupportedVariants": [
+    "amazons",
+    "capablanca",
+    "centaur",
+    "chancellor",
+    "courier",
+    "duck",
+    "embassy",
+    "flipello10",
+    "grand",
+    "gustav3",
+    "janggi",
+    "janus",
+    "jesonmor",
+    "manchu",
+    "modern",
+    "omicron",
+    "opulent",
+    "shako",
+    "shogi",
+    "shoshogi",
+    "tencubed",
+    "troitzky",
+    "wolf",
+    "xiangqi",
+    "yarishogi"
+  ],
+  "results": [
+    {
+      "variant": "chess",
+      "depth": 5,
+      "nodes": 4865609
+    },
+    {
+      "variant": "chess",
+      "depth": 5,
+      "nodes": 193690690
+    },
+    {
+      "variant": "chess",
+      "depth": 6,
+      "nodes": 11030083
+    },
+    {
+      "variant": "chess",
+      "depth": 5,
+      "nodes": 15833292
+    },
+    {
+      "variant": "chess",
+      "depth": 5,
+      "nodes": 89941194
+    },
+    {
+      "variant": "chess",
+      "depth": 5,
+      "nodes": 164075551
+    },
+    {
+      "variant": "losalamos",
+      "depth": 5,
+      "nodes": 191846
+    },
+    {
+      "variant": "losalamos",
+      "depth": 6,
+      "nodes": 187431
+    },
+    {
+      "variant": "torpedo",
+      "depth": 4,
+      "nodes": 209719
+    },
+    {
+      "variant": "torpedo",
+      "depth": 4,
+      "nodes": 232819
+    },
+    {
+      "variant": "berolina",
+      "depth": 3,
+      "nodes": 46643
+    },
+    {
+      "variant": "berolina",
+      "depth": 3,
+      "nodes": 1983
+    },
+    {
+      "variant": "berolina",
+      "depth": 2,
+      "nodes": 1047
+    },
+    {
+      "variant": "pawnsideways",
+      "depth": 3,
+      "nodes": 10022
+    },
+    {
+      "variant": "pawnback",
+      "depth": 3,
+      "nodes": 9222
+    },
+    {
+      "variant": "legan",
+      "depth": 4,
+      "nodes": 8138
+    },
+    {
+      "variant": "makruk",
+      "depth": 4,
+      "nodes": 273026
+    },
+    {
+      "variant": "cambodian",
+      "depth": 4,
+      "nodes": 361719
+    },
+    {
+      "variant": "cambodian",
+      "depth": 2,
+      "nodes": 72
+    },
+    {
+      "variant": "karouk",
+      "depth": 4,
+      "nodes": 358460
+    },
+    {
+      "variant": "makpong",
+      "depth": 4,
+      "nodes": 593103
+    },
+    {
+      "variant": "asean",
+      "depth": 4,
+      "nodes": 273026
+    },
+    {
+      "variant": "ai-wok",
+      "depth": 4,
+      "nodes": 485045
+    },
+    {
+      "variant": "ai-wok",
+      "depth": 5,
+      "nodes": 30055
+    },
+    {
+      "variant": "sittuyin",
+      "depth": 3,
+      "nodes": 580096
+    },
+    {
+      "variant": "sittuyin",
+      "depth": 4,
+      "nodes": 652686
+    },
+    {
+      "variant": "sittuyin",
+      "depth": 4,
+      "nodes": 373984
+    },
+    {
+      "variant": "sittuyin",
+      "depth": 4,
+      "nodes": 268869
+    },
+    {
+      "variant": "sittuyin",
+      "depth": 5,
+      "nodes": 68662
+    },
+    {
+      "variant": "almost",
+      "depth": 3,
+      "nodes": 11895
+    },
+    {
+      "variant": "almost",
+      "depth": 2,
+      "nodes": 140
+    },
+    {
+      "variant": "sortofalmost",
+      "depth": 3,
+      "nodes": 10815
+    },
+    {
+      "variant": "sortofalmost",
+      "depth": 2,
+      "nodes": 139
+    },
+    {
+      "variant": "chigorin",
+      "depth": 3,
+      "nodes": 11408
+    },
+    {
+      "variant": "chigorin",
+      "depth": 2,
+      "nodes": 117
+    },
+    {
+      "variant": "perfect",
+      "depth": 3,
+      "nodes": 15082
+    },
+    {
+      "variant": "perfect",
+      "depth": 3,
+      "nodes": 17500
+    },
+    {
+      "variant": "spartan",
+      "depth": 3,
+      "nodes": 14244
+    },
+    {
+      "variant": "spartan",
+      "depth": 3,
+      "nodes": 6130
+    },
+    {
+      "variant": "spartan",
+      "depth": 3,
+      "nodes": 3456
+    },
+    {
+      "variant": "shatar",
+      "depth": 4,
+      "nodes": 177344
+    },
+    {
+      "variant": "shatranj",
+      "depth": 4,
+      "nodes": 68122
+    },
+    {
+      "variant": "amazon",
+      "depth": 4,
+      "nodes": 318185
+    },
+    {
+      "variant": "nightrider",
+      "depth": 4,
+      "nodes": 419019
+    },
+    {
+      "variant": "grasshopper",
+      "depth": 4,
+      "nodes": 635298
+    },
+    {
+      "variant": "hoppelpoppel",
+      "depth": 4,
+      "nodes": 202459
+    },
+    {
+      "variant": "newzealand",
+      "depth": 4,
+      "nodes": 200310
+    },
+    {
+      "variant": "racingkings",
+      "depth": 4,
+      "nodes": 296242
+    },
+    {
+      "variant": "racingkings",
+      "depth": 4,
+      "nodes": 86041
+    },
+    {
+      "variant": "racingkings",
+      "depth": 4,
+      "nodes": 86009
+    },
+    {
+      "variant": "racingkings",
+      "depth": 6,
+      "nodes": 265932
+    },
+    {
+      "variant": "kingofthehill",
+      "depth": 3,
+      "nodes": 19003
+    },
+    {
+      "variant": "3check",
+      "depth": 3,
+      "nodes": 12407
+    },
+    {
+      "variant": "3check",
+      "depth": 3,
+      "nodes": 12407
+    },
+    {
+      "variant": "atomic",
+      "depth": 4,
+      "nodes": 197326
+    },
+    {
+      "variant": "atomic",
+      "depth": 4,
+      "nodes": 1434825
+    },
+    {
+      "variant": "atomic",
+      "depth": 4,
+      "nodes": 714499
+    },
+    {
+      "variant": "atomic",
+      "depth": 2,
+      "nodes": 148
+    },
+    {
+      "variant": "atomar",
+      "depth": 4,
+      "nodes": 197779
+    },
+    {
+      "variant": "atomar",
+      "depth": 3,
+      "nodes": 24644
+    },
+    {
+      "variant": "nocheckatomic",
+      "depth": 4,
+      "nodes": 197779
+    },
+    {
+      "variant": "nocheckatomic",
+      "depth": 3,
+      "nodes": 21347
+    },
+    {
+      "variant": "antichess",
+      "depth": 4,
+      "nodes": 153299
+    },
+    {
+      "variant": "giveaway",
+      "depth": 4,
+      "nodes": 153299
+    },
+    {
+      "variant": "giveaway",
+      "depth": 4,
+      "nodes": 3
+    },
+    {
+      "variant": "giveaway",
+      "depth": 12,
+      "nodes": 2557
+    },
+    {
+      "variant": "codrus",
+      "depth": 4,
+      "nodes": 153299
+    },
+    {
+      "variant": "codrus",
+      "depth": 4,
+      "nodes": 19
+    },
+    {
+      "variant": "horde",
+      "depth": 4,
+      "nodes": 23310
+    },
+    {
+      "variant": "horde",
+      "depth": 4,
+      "nodes": 56539
+    },
+    {
+      "variant": "horde",
+      "depth": 4,
+      "nodes": 33781
+    },
+    {
+      "variant": "horde",
+      "depth": 4,
+      "nodes": 128809
+    },
+    {
+      "variant": "horde",
+      "depth": 4,
+      "nodes": 197287
+    },
+    {
+      "variant": "coregal",
+      "depth": 4,
+      "nodes": 195896
+    },
+    {
+      "variant": "coregal",
+      "depth": 3,
+      "nodes": 20421
+    },
+    {
+      "variant": "coregal",
+      "depth": 4,
+      "nodes": 55970
+    },
+    {
+      "variant": "coregal",
+      "depth": 4,
+      "nodes": 136511
+    },
+    {
+      "variant": "knightmate",
+      "depth": 4,
+      "nodes": 139774
+    },
+    {
+      "variant": "losers",
+      "depth": 4,
+      "nodes": 152955
+    },
+    {
+      "variant": "kinglet",
+      "depth": 4,
+      "nodes": 197742
+    },
+    {
+      "variant": "threekings",
+      "depth": 4,
+      "nodes": 199514
+    },
+    {
+      "variant": "dobutsu",
+      "depth": 6,
+      "nodes": 71677
+    },
+    {
+      "variant": "dobutsu",
+      "depth": 4,
+      "nodes": 2290
+    },
+    {
+      "variant": "crazyhouse",
+      "depth": 4,
+      "nodes": 197281
+    },
+    {
+      "variant": "crazyhouse",
+      "depth": 2,
+      "nodes": 75353
+    },
+    {
+      "variant": "crazyhouse",
+      "depth": 3,
+      "nodes": 88634
+    },
+    {
+      "variant": "crazyhouse",
+      "depth": 3,
+      "nodes": 88634
+    },
+    {
+      "variant": "crazyhouse",
+      "depth": 3,
+      "nodes": 58057
+    },
+    {
+      "variant": "loop",
+      "depth": 4,
+      "nodes": 197281
+    },
+    {
+      "variant": "loop",
+      "depth": 2,
+      "nodes": 31983
+    },
+    {
+      "variant": "chessgi",
+      "depth": 4,
+      "nodes": 197281
+    },
+    {
+      "variant": "chessgi",
+      "depth": 2,
+      "nodes": 32816
+    },
+    {
+      "variant": "pocketknight",
+      "depth": 3,
+      "nodes": 88617
+    },
+    {
+      "variant": "placement",
+      "depth": 3,
+      "nodes": 50560
+    },
+    {
+      "variant": "placement",
+      "depth": 6,
+      "nodes": 17804
+    },
+    {
+      "variant": "placement",
+      "depth": 5,
+      "nodes": 145152
+    },
+    {
+      "variant": "placement",
+      "depth": 4,
+      "nodes": 18492
+    },
+    {
+      "variant": "seirawan",
+      "depth": 4,
+      "nodes": 782599
+    },
+    {
+      "variant": "seirawan",
+      "depth": 4,
+      "nodes": 890467
+    },
+    {
+      "variant": "shouse",
+      "depth": 3,
+      "nodes": 546694
+    },
+    {
+      "variant": "euroshogi",
+      "depth": 4,
+      "nodes": 380499
+    },
+    {
+      "variant": "minishogi",
+      "depth": 5,
+      "nodes": 533203
+    },
+    {
+      "variant": "kyotoshogi",
+      "depth": 5,
+      "nodes": 225903
+    },
+    {
+      "variant": "micro",
+      "depth": 5,
+      "nodes": 71328
+    },
+    {
+      "variant": "torishogi",
+      "depth": 4,
+      "nodes": 103857
+    },
+    {
+      "variant": "koedem",
+      "depth": 1,
+      "nodes": 34
+    },
+    {
+      "variant": "koedem",
+      "depth": 1,
+      "nodes": 54
+    },
+    {
+      "variant": "ataxx",
+      "depth": 4,
+      "nodes": 155888
+    },
+    {
+      "variant": "ataxx",
+      "depth": 5,
+      "nodes": 452980
+    },
+    {
+      "variant": "breakthrough",
+      "depth": 4,
+      "nodes": 256036
+    },
+    {
+      "variant": "breakthrough",
+      "depth": 4,
+      "nodes": 121264
+    },
+    {
+      "variant": "clobber",
+      "depth": 3,
+      "nodes": 80063
+    },
+    {
+      "variant": "flipello",
+      "depth": 7,
+      "nodes": 55092
+    },
+    {
+      "variant": "flipersi",
+      "depth": 9,
+      "nodes": 38208
+    },
+    {
+      "variant": "atomic",
+      "depth": 4,
+      "nodes": 61401
+    },
+    {
+      "variant": "atomic",
+      "depth": 4,
+      "nodes": 98729
+    },
+    {
+      "variant": "atomic",
+      "depth": 4,
+      "nodes": 241478
+    },
+    {
+      "variant": "atomic",
+      "depth": 4,
+      "nodes": 17915
+    },
+    {
+      "variant": "extinction",
+      "depth": 4,
+      "nodes": 195286
+    },
+    {
+      "variant": "seirawan",
+      "depth": 3,
+      "nodes": 21170
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import { whiteEvaluationHeight, rememberEvaluation } from './.compiled/evaluation.js';
+assert(whiteEvaluationHeight(400) > 50);
+assert(whiteEvaluationHeight(-400) < 50);
+assert.equal(whiteEvaluationHeight(),50);
+assert.equal(whiteEvaluationHeight(400)+whiteEvaluationHeight(-400),100);
+let value=rememberEvaluation(undefined,'game-a',-400,'-4.00');
+for(let i=0;i<20;i++) value=rememberEvaluation(value,'game-a',undefined,'pending');
+assert.equal(value.score,-400);assert.equal(value.label,'-4.00');
+assert.equal(whiteEvaluationHeight(value.score),whiteEvaluationHeight(-400));
+value=rememberEvaluation(value,'game-a',250,'+2.50');assert.equal(value.score,250);
+value=rememberEvaluation(value,'game-b',undefined,'pending');assert.equal(value.score,undefined);
+value=rememberEvaluation(value,'game-b',0,'0.00');assert.equal(value.score,0);
+console.log('White/black evaluation direction, signed score retention during navigation/search, explicit zero and new-game reset verified.');

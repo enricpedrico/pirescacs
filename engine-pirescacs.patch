@@ -1,0 +1,912 @@
+diff --git a/src/apiutil.h b/src/apiutil.h
+index c898cf2..a7836a4 100644
+--- a/src/apiutil.h
++++ b/src/apiutil.h
+@@ -364,6 +364,7 @@ inline const std::string move_to_san(Position& pos, Move m, Notation n) {
+ } // namespace SAN
+ 
+ inline bool has_insufficient_material(Color c, const Position& pos) {
++    if (pos.pirescacs()) return false;
+ 
+     // Other win rules
+     if (   pos.captures_to_hand()
+diff --git a/src/evaluate.cpp b/src/evaluate.cpp
+index dca3a34..b6b1551 100644
+--- a/src/evaluate.cpp
++++ b/src/evaluate.cpp
+@@ -1621,6 +1621,50 @@ Value Eval::evaluate(const Position& pos) {
+ 
+   Value v;
+ 
++  if (pos.pirescacs()) {
++      int score[2] = {0, 0};
++      for (Color c : {WHITE, BLACK}) {
++                    for (Bitboard b = pos.pieces(c); b;) {
++              Square s = pop_lsb(b);
++              PieceType pt = type_of(pos.piece_on(s));
++              int advance = int(relative_rank(c, s));
++              int center = 7 - std::abs(2 * int(file_of(s)) - 7) / 2 - std::abs(2 * int(rank_of(s)) - 7) / 2;
++              if (pt == ROOK) {
++                  // Winning distance, cleared route and enemy's ability to blockade.
++                  static const int progress[] = {0, 95, 220, 410, 710, 1200, 2300, 10000};
++                  score[c] += progress[advance];
++                  Square front = Square(s + pawn_push(c));
++                  if (is_ok(front)) {
++                      if (!pos.empty(front) && color_of(pos.piece_on(front)) != c) score[c] -= 280 + 60 * advance;
++                      else score[c] += 110;
++                      if (pos.attackers_to(front, ~c)) score[c] -= 60;
++                  }
++                  continue;
++              }
++              int mobility = popcount(pos.attacks_from(c, pt, s) & ~pos.pieces(c) & ~pos.pieces(~c, ROOK));
++              if (pt == PAWN) score[c] += 208 + 12 * advance + 3 * center + (pos.virgin_pawns() & s ? 16 : 0);
++              else if (pt == BISHOP) score[c] += 670 + 14 * mobility;
++              else if (pt == CUSTOM_PIECE_1) score[c] += 620 + 18 * mobility + 6 * center;
++              else if (pt == COMMONER) {
++                  score[c] += 440 + 8 * mobility + 5 * center;
++                  if (c == pos.side_to_move() && (pos.pir_medics() & s)) {
++                      int restored = pos.pir_revival_type() == BISHOP ? 670 : pos.pir_revival_type() == CUSTOM_PIECE_1 ? 620 : pos.pir_revival_type() == COMMONER ? 440 : pos.pir_revival_type() == CUSTOM_PIECE_2 ? 950 : 208;
++                      score[c] += std::max(0, restored - 440) / 3;
++                  }
++              }
++              else if (pt == CUSTOM_PIECE_2) score[c] += 950 + 16 * mobility;
++              else if (pt == CUSTOM_PIECE_3) score[c] += 1550 + 12 * mobility;
++              else if (pt == KING) score[c] += 10 * mobility;
++              if (pt != KING && pos.attackers_to(s, ~c)) score[c] -= pos.attackers_to(s, c) ? 15 : 65;
++          }
++          for (Bitboard kings = pos.pieces(c, KING); kings;) {
++              Bitboard near = attacks_bb<KING>(pop_lsb(kings));
++              while (near) if (pos.attackers_to(pop_lsb(near), ~c)) score[c] -= 30;
++          }
++      }
++      int advantage = score[pos.side_to_move()] - score[~pos.side_to_move()];
++      return Value(std::clamp(advantage + 18, -12000, 12000));
++  }
+   if (!Eval::useNNUE || !pos.nnue_applicable())
+       v = Evaluation<NO_TRACE>(pos).value();
+   else
+diff --git a/src/movegen.cpp b/src/movegen.cpp
+index a7b6a9f..b754ba4 100644
+--- a/src/movegen.cpp
++++ b/src/movegen.cpp
+@@ -473,6 +473,57 @@ namespace {
+     return moveList;
+   }
+ 
++template<GenType Type>
++ExtMove* generate_pirescacs(const Position& pos, ExtMove* list) {
++    Color us = pos.side_to_move();
++    auto emit = [&](Move m) {
++        bool tactical = pos.capture(m) || type_of(m) == PIR_RETURN || type_of(m) == PIR_REVIVE
++                     || (type_of(pos.moved_piece(m)) == ROOK && relative_rank(us, to_sq(m)) == RANK_8);
++        if (Type == CAPTURES && !tactical) return;
++        if (Type == QUIETS && tactical) return;
++        if (Type == QUIET_CHECKS && (tactical || !pos.gives_check(m))) return;
++        *list++ = m;
++    };
++    auto pawnMove = [&](Square from, Square to) {
++        if (relative_rank(us, to) == RANK_8) {
++            Bitboard empty = ~(pos.pieces() ^ from) & (us == WHITE ? (Rank1BB | Rank2BB | Rank3BB | Rank4BB) : (Rank5BB | Rank6BB | Rank7BB | Rank8BB));
++            while (empty) emit(make_gating<PIR_RETURN>(from, to, NO_PIECE_TYPE, pop_lsb(empty)));
++        } else emit(make_move(from, to));
++    };
++    for (Bitboard pieces = pos.pieces(us); pieces;) {
++        Square from = pop_lsb(pieces);
++        PieceType pt = type_of(pos.piece_on(from));
++        if (pt == ROOK) {
++            if (relative_rank(us, from) == RANK_8) continue;
++            Square to = Square(from + pawn_push(us));
++            if (pos.empty(to)) emit(make_move(from, to));
++            else if (color_of(pos.piece_on(to)) == us) emit(make<PIR_SWAP>(from, to));
++        } else if (pt == PAWN) {
++            if (relative_rank(us, from) == RANK_8) continue;
++            Square to = Square(from + pawn_push(us));
++            if (pos.empty(to)) {
++                pawnMove(from, to);
++                if ((pos.virgin_pawns() & from) && relative_rank(us, from) == RANK_2 && pos.empty(Square(to + pawn_push(us))))
++                    emit(make_move(from, Square(to + pawn_push(us))));
++            }
++            Bitboard targets = pawn_attacks_bb(us, from) & pos.pieces(~us) & ~pos.pieces(~us, ROOK, KING);
++            while (targets) pawnMove(from, pop_lsb(targets));
++            if (pos.pirescacs_version() >= 4) {
++                Bitboard ep = pawn_attacks_bb(us, from) & pos.ep_squares();
++                while (ep) {
++                    Square epTo = pop_lsb(ep), victim = Square(epTo - pawn_push(us));
++                    if (pos.empty(epTo) && pos.piece_on(victim) == make_piece(~us, PAWN)) emit(make<EN_PASSANT>(from, epTo));
++                }
++            }
++        } else {
++            Bitboard targets = pos.attacks_from(us, pt, from) & ~pos.pieces(us) & ~pos.pieces(~us, ROOK, KING);
++            while (targets) emit(make_move(from, pop_lsb(targets)));
++            if (pt == COMMONER && (pos.pir_medics() & from)) emit(make<PIR_REVIVE>(from, from));
++        }
++    }
++    return list;
++}
++
+ } // namespace
+ 
+ 
+@@ -488,6 +539,7 @@ template<GenType Type>
+ ExtMove* generate(const Position& pos, ExtMove* moveList) {
+ 
+   static_assert(Type != LEGAL, "Unsupported type in generate()");
++  if (pos.pirescacs()) return generate_pirescacs<Type>(pos, moveList);
+   assert((Type == EVASIONS) == (bool)pos.checkers());
+ 
+   Color us = pos.side_to_move();
+diff --git a/src/position.cpp b/src/position.cpp
+index 2b5ae3a..87b215b 100644
+--- a/src/position.cpp
++++ b/src/position.cpp
+@@ -38,6 +38,8 @@ namespace Stockfish {
+ 
+ namespace Zobrist {
+ 
++  Key virgin[SQUARE_NB];
++  Key revival[PIECE_TYPE_NB][SQUARE_NB];
+   Key psq[PIECE_NB][SQUARE_NB];
+   Key enpassant[FILE_NB];
+   Key castling[CASTLING_RIGHT_NB];
+@@ -158,6 +160,9 @@ Move cuckooMove[8192];
+ void Position::init() {
+ 
+   PRNG rng(1070372);
++  for (Square s = SQ_A1; s < SQUARE_NB; ++s) Zobrist::virgin[s] = rng.rand<Key>();
++  for (int pt = 0; pt < PIECE_TYPE_NB; ++pt)
++      for (Square s = SQ_A1; s < SQUARE_NB; ++s) Zobrist::revival[pt][s] = rng.rand<Key>();
+ 
+   for (Color c : {WHITE, BLACK})
+       for (PieceType pt = PAWN; pt <= KING; ++pt)
+@@ -540,6 +545,24 @@ Position& Position::set(const Variant* v, const string& fenStr, bool isChess960,
+       }
+   }
+ 
++  if (pirescacs()) {
++      st->pirReviveType = NO_PIECE_TYPE;
++      st->pirReviveSquare = SQ_NONE;
++      if (fenStr == v->startFen || fenStr == v->startFen + " ") st->virginPawns = pieces(PAWN);
++      std::string extra;
++      while (ss >> extra) {
++          if (extra.rfind("v:", 0) == 0) {
++              std::istringstream mask(extra.substr(2));
++              uint64_t value = 0; mask >> std::hex >> value;
++              st->virginPawns = Bitboard(value) & pieces(PAWN);
++          } else if (v->pirescacsVersion >= 4 && extra.rfind("r:", 0) == 0) {
++              auto pc = piece_to_char().find(extra[2]);
++              st->pirReviveType = type_of(Piece(pc));
++              st->pirReviveSquare = make_square(File(extra[4] - 'a'), Rank(extra[5] - '1'));
++          }
++      }
++      if (!pir_medics()) { st->pirReviveType = NO_PIECE_TYPE; st->pirReviveSquare = SQ_NONE; }
++  }
+   chess960 = isChess960 || v->chess960;
+   tsumeMode = Options["TsumeMode"];
+   thisThread = th;
+@@ -576,6 +599,22 @@ void Position::set_castling_right(Color c, Square rfrom) {
+ /// Position::set_check_info() sets king attacks to detect if a move gives check
+ 
+ void Position::set_check_info(StateInfo* si) const {
++  if (pirescacs()) {
++      // Every royal is protected in edited positions. Full-board legality, rather
++      // than chess pin/evasion shortcuts, remains the authority for this variant.
++      si->blockersForKing[WHITE] = si->blockersForKing[BLACK] = 0;
++      si->pinners[WHITE] = si->pinners[BLACK] = 0;
++      std::fill(std::begin(si->checkSquares), std::end(si->checkSquares), Bitboard(0));
++      si->nonSlidingRiders = si->pseudoRoyalCandidates = si->pseudoRoyals = 0;
++      for (PieceSet ps = piece_types(); ps;) {
++          PieceType pt = pop_lsb(ps), movePt = pt == KING ? king_type() : pt;
++          for (Bitboard kings = pieces(~sideToMove, KING); kings;)
++              si->checkSquares[pt] |= attacks_bb(~sideToMove, movePt, pop_lsb(kings), pieces());
++          if (AttackRiderTypes[movePt] & NON_SLIDING_RIDERS) si->nonSlidingRiders |= pieces(pt);
++      }
++      si->shak = si->bikjang = false; si->chased = 0; si->legalCapture = NO_VALUE;
++      return;
++  }
+ 
+   si->blockersForKing[WHITE] = slider_blockers(pieces(BLACK), count<KING>(WHITE) ? square<KING>(WHITE) : SQ_NONE, si->pinners[BLACK], BLACK);
+   si->blockersForKing[BLACK] = slider_blockers(pieces(WHITE), count<KING>(BLACK) ? square<KING>(BLACK) : SQ_NONE, si->pinners[WHITE], WHITE);
+@@ -625,6 +664,11 @@ void Position::set_state(StateInfo* si) const {
+   si->pawnKey = Zobrist::noPawns;
+   si->nonPawnMaterial[WHITE] = si->nonPawnMaterial[BLACK] = VALUE_ZERO;
+   si->checkersBB = count<KING>(sideToMove) ? attackers_to(square<KING>(sideToMove), ~sideToMove) : Bitboard(0);
++  if (pirescacs()) {
++      si->checkersBB = 0;
++      for (Bitboard kings = pieces(sideToMove, KING); kings;)
++          si->checkersBB |= attackers_to(pop_lsb(kings), ~sideToMove);
++  }
+   si->move = MOVE_NONE;
+ 
+   set_check_info(si);
+@@ -652,6 +696,10 @@ void Position::set_state(StateInfo* si) const {
+       si->key ^= Zobrist::side;
+ 
+   si->key ^= Zobrist::castling[si->castlingRights];
++  if (pirescacs()) {
++      for (Bitboard b = si->virginPawns; b;) si->key ^= Zobrist::virgin[pop_lsb(b)];
++      if (si->pirReviveType != NO_PIECE_TYPE) si->key ^= Zobrist::revival[si->pirReviveType][si->pirReviveSquare];
++  }
+ 
+   for (Color c : {WHITE, BLACK})
+       for (PieceType pt = PAWN; pt <= KING; ++pt)
+@@ -835,6 +883,11 @@ string Position::fen(bool sfen, bool showPromoted, int countStarted, std::string
+ 
+   ss << " " << 1 + (gamePly - (sideToMove == BLACK)) / 2;
+ 
++  if (pirescacs()) {
++      ss << " v:" << std::hex << uint64_t(st->virginPawns);
++      if (st->pirReviveType != NO_PIECE_TYPE)
++          ss << " r:" << piece_to_char()[make_piece(sideToMove, st->pirReviveType)] << "@" << UCI::square(*this, st->pirReviveSquare);
++  }
+   return ss.str();
+ }
+ 
+@@ -931,6 +984,16 @@ Bitboard Position::slider_blockers(Bitboard sliders, Square s, Bitboard& pinners
+ 
+ Bitboard Position::attackers_to(Square s, Bitboard occupied, Color c, Bitboard janggiCannons) const {
+ 
++  if (pirescacs()) {
++      Bitboard result = 0;
++      for (Bitboard b = pieces(c); b;) {
++          Square from = pop_lsb(b);
++          PieceType pt = type_of(piece_on(from));
++          if (pt == ROOK) continue; // Ships never attack.
++          if (attacks_bb(c, pt == KING ? QUEEN : pt, from, occupied) & s) result |= from;
++      }
++      return result;
++  }
+   // Use a faster version for variants with moderate rule variations
+   if (var->fastAttacks)
+   {
+@@ -1047,6 +1110,7 @@ Bitboard Position::checked_pseudo_royals(Color c) const {
+ /// Position::legal() tests whether a pseudo-legal move is legal
+ 
+ bool Position::legal(Move m) const {
++  if (pirescacs()) return pir_legal(m);
+ 
+   assert(is_ok(m));
+   assert(type_of(m) != DROP || piece_drops());
+@@ -1303,6 +1367,11 @@ bool Position::legal(Move m) const {
+ /// due to SMP concurrent access or hash position key aliasing.
+ 
+ bool Position::pseudo_legal(const Move m) const {
++  if (pirescacs()) {
++      for (const auto& candidate : MoveList<NON_EVASIONS>(*this))
++          if (candidate.move == m) return pir_legal(m);
++      return false;
++  }
+ 
+   Color us = sideToMove;
+   Square from = from_sq(m);
+@@ -1429,6 +1498,7 @@ bool Position::pseudo_legal(const Move m) const {
+ /// Position::gives_check() tests whether a pseudo-legal move gives a check
+ 
+ bool Position::gives_check(Move m) const {
++  if (pirescacs()) return pir_gives_check(m);
+ 
+   assert(is_ok(m));
+   assert(color_of(moved_piece(m)) == sideToMove);
+@@ -1540,11 +1610,113 @@ bool Position::gives_check(Move m) const {
+   }
+ }
+ 
++Bitboard Position::pir_medics() const {
++    if (st->pirReviveType == NO_PIECE_TYPE || st->pirReviveSquare == SQ_NONE) return 0;
++    Bitboard result = 0;
++    for (Bitboard medics = pieces(sideToMove, COMMONER); medics;) {
++        Square s = pop_lsb(medics);
++        if (std::max(std::abs(int(file_of(s)) - int(file_of(st->pirReviveSquare))),
++                     std::abs(int(rank_of(s)) - int(rank_of(st->pirReviveSquare)))) <= 4) result |= s;
++    }
++    return result;
++}
++
++// Full final-board legality is essential for swaps and rebirths, including double check.
++bool Position::pir_legal(Move m) const {
++    if (pirescacs_version() >= 5) return true; // No royal safety or check restrictions.
++    Position& p = const_cast<Position&>(*this);
++    StateInfo next;
++    Color us = sideToMove;
++    uint64_t savedNodes = thisThread ? thisThread->nodes.load() : 0;
++    p.pir_do_move(m, next);
++    bool ok = true;
++    for (Bitboard kings = p.pieces(us, KING); kings;)
++        if (p.attackers_to(pop_lsb(kings), ~us)) ok = false;
++    if (type_of(m) == PIR_RETURN)
++        for (Bitboard kings = p.pieces(~us, KING); kings;)
++            if (p.attackers_to(pop_lsb(kings), us)) ok = false;
++    p.pir_undo_move(m);
++    if (thisThread) thisThread->nodes.store(savedNodes);
++    return ok;
++}
++
++bool Position::pir_gives_check(Move m) const {
++    Position& p = const_cast<Position&>(*this);
++    StateInfo next;
++    uint64_t savedNodes = thisThread ? thisThread->nodes.load() : 0;
++    p.pir_do_move(m, next);
++    bool result = bool(p.checkers());
++    p.pir_undo_move(m);
++    if (thisThread) thisThread->nodes.store(savedNodes);
++    return result;
++}
++
++void Position::pir_do_move(Move m, StateInfo& newSt) {
++    if (thisThread) thisThread->nodes.fetch_add(1, std::memory_order_relaxed);
++    std::memcpy(&newSt, st, offsetof(StateInfo, key));
++    newSt.previous = st;
++    newSt.accumulator.computed[WHITE] = newSt.accumulator.computed[BLACK] = false;
++    Color us = sideToMove;
++    Square from = from_sq(m), to = to_sq(m);
++    Square capturedAt = type_of(m) == EN_PASSANT ? Square(to - pawn_push(us)) : to;
++    Piece moved = piece_on(from), target = piece_on(capturedAt);
++    PieceType revived = st->pirReviveType;
++    newSt.pirSacrificed = type_of(m) == PIR_REVIVE ? moved : NO_PIECE;
++    newSt.pirSwapped = type_of(m) == PIR_SWAP ? target : NO_PIECE;
++    newSt.capturedPiece = type_of(m) == PIR_SWAP || type_of(m) == PIR_REVIVE ? NO_PIECE : target;
++    newSt.captureSquare = capturedAt;
++    newSt.rule50 = (target || type_of(moved) == PAWN || type_of(moved) == ROOK) ? 0 : st->rule50 + 1;
++    newSt.pliesFromNull++;
++    newSt.virginPawns &= ~(square_bb(from) | to | capturedAt);
++    newSt.epSquares = 0;
++    newSt.pirReviveType = NO_PIECE_TYPE; newSt.pirReviveSquare = SQ_NONE;
++    st = &newSt;
++    remove_piece(from);
++    if (type_of(m) == PIR_REVIVE) put_piece(make_piece(us, revived), from);
++    else {
++        if (target) remove_piece(capturedAt);
++        if (type_of(m) == PIR_SWAP) put_piece(target, from);
++        put_piece(moved, type_of(m) == PIR_RETURN ? gating_square(m) : to);
++        if (pirescacs_version() >= 4 && type_of(moved) == PAWN && std::abs(int(to) - int(from)) == 2 * NORTH) {
++            Square ep = Square(from + pawn_push(us));
++            if (pawn_attacks_bb(us, ep) & pieces(~us, PAWN)) newSt.epSquares = square_bb(ep);
++        }
++    }
++    sideToMove = ~sideToMove;
++    if (pirescacs_version() >= 4 && newSt.capturedPiece && type_of(newSt.capturedPiece) != pir_captain_type() && type_of(newSt.capturedPiece) != ROOK) {
++        newSt.pirReviveType = type_of(newSt.capturedPiece); newSt.pirReviveSquare = capturedAt;
++        if (!pir_medics()) { newSt.pirReviveType = NO_PIECE_TYPE; newSt.pirReviveSquare = SQ_NONE; }
++    }
++    ++gamePly;
++    set_state(st);
++    st->move = m; st->repetition = 0;
++    StateInfo* old = st->previous;
++    for (int i = 1; old && i <= st->pliesFromNull; ++i, old = old->previous)
++        if (i >= 4 && !(i % 2) && old->key == st->key) {
++            st->repetition = old->repetition ? -i : i; break;
++        }
++}
++
++void Position::pir_undo_move(Move m) {
++    Square from = from_sq(m), to = to_sq(m);
++    Square landing = type_of(m) == PIR_RETURN ? gating_square(m) : to;
++    Piece moved = piece_on(landing);
++    Piece captured = st->capturedPiece, swapped = st->pirSwapped, sacrificed = st->pirSacrificed;
++    remove_piece(landing);
++    if (swapped) remove_piece(from);
++    put_piece(sacrificed ? sacrificed : moved, from);
++    if (swapped) put_piece(swapped, to);
++    else if (captured) put_piece(captured, st->captureSquare);
++    sideToMove = ~sideToMove; --gamePly; st = st->previous;
++}
++
++
+ /// Position::do_move() makes a move, and saves all information necessary
+ /// to a StateInfo object. The move is assumed to be legal. Pseudo-legal
+ /// moves should be filtered out before this function is called.
+ 
+ void Position::do_move(Move m, StateInfo& newSt, bool givesCheck) {
++  if (pirescacs()) { pir_do_move(m, newSt); return; }
+ 
+   assert(is_ok(m));
+   assert(&newSt != st);
+@@ -2119,7 +2291,7 @@ void Position::do_move(Move m, StateInfo& newSt, bool givesCheck) {
+   // occurrence of the same position, negative in the 3-fold case, or zero
+   // if the position was not repeated.
+   st->repetition = 0;
+-  int end = captures_to_hand() ? st->pliesFromNull : std::min(st->rule50, st->pliesFromNull);
++  int end = (captures_to_hand() || pirescacs()) ? st->pliesFromNull : std::min(st->rule50, st->pliesFromNull);
+   if (end >= 4)
+   {
+       StateInfo* stp = st->previous->previous;
+@@ -2142,6 +2314,7 @@ void Position::do_move(Move m, StateInfo& newSt, bool givesCheck) {
+ /// be restored to exactly the same state as before the move was made.
+ 
+ void Position::undo_move(Move m) {
++  if (pirescacs()) { pir_undo_move(m); return; }
+ 
+   assert(is_ok(m));
+ 
+@@ -2467,6 +2640,7 @@ Value Position::blast_see(Move m) const {
+ /// algorithm similar to alpha-beta pruning with a null window.
+ 
+ bool Position::see_ge(Move m, Value threshold) const {
++  if (pirescacs()) return true; // Conventional exchange recursion assumes capturable rooks and single-square pawn arrivals.
+ 
+   assert(is_ok(m));
+ 
+@@ -2652,7 +2826,7 @@ bool Position::is_optional_game_end(Value& result, int ply, int countStarted) co
+   // n-fold repetition
+   if (n_fold_rule())
+   {
+-      int end = captures_to_hand() ? st->pliesFromNull : std::min(st->rule50, st->pliesFromNull);
++      int end = (captures_to_hand() || pirescacs()) ? st->pliesFromNull : std::min(st->rule50, st->pliesFromNull);
+ 
+       if (end >= 4)
+       {
+@@ -2762,6 +2936,14 @@ bool Position::is_optional_game_end(Value& result, int ply, int countStarted) co
+ 
+ bool Position::is_immediate_game_end(Value& result, int ply) const {
+ 
++  if (pirescacs() && pirescacs_version() >= 5) {
++      // Either ship wins on arrival, also for arbitrary editor positions.
++      bool ours = flag_reached(sideToMove), theirs = flag_reached(~sideToMove);
++      if (!ours && !theirs) return false;
++      result = ours && theirs ? VALUE_DRAW : ours ? mate_in(ply) : mated_in(ply);
++      return true;
++  }
++
+   // Extinction
+   // Extinction does not apply for pseudo-royal pieces, because they can not be captured
+   if (extinction_value() != VALUE_NONE && (!var->extinctionPseudoRoyal || blast_on_capture()))
+@@ -3099,7 +3281,7 @@ Bitboard Position::chased() const {
+ bool Position::has_repeated() const {
+ 
+     StateInfo* stc = st;
+-    int end = captures_to_hand() ? st->pliesFromNull : std::min(st->rule50, st->pliesFromNull);
++    int end = (captures_to_hand() || pirescacs()) ? st->pliesFromNull : std::min(st->rule50, st->pliesFromNull);
+     while (end-- >= 4)
+     {
+         if (stc->repetition)
+@@ -3115,10 +3297,11 @@ bool Position::has_repeated() const {
+ /// or an earlier position has a move that directly reaches the current position.
+ 
+ bool Position::has_game_cycle(int ply) const {
++  if (pirescacs()) return false; // Chess reversible-move cuckoo table does not cover returns.
+ 
+   int j;
+ 
+-  int end = captures_to_hand() ? st->pliesFromNull : std::min(st->rule50, st->pliesFromNull);
++  int end = (captures_to_hand() || pirescacs()) ? st->pliesFromNull : std::min(st->rule50, st->pliesFromNull);
+ 
+   if (end < 3 || var->nFoldValue != VALUE_DRAW || var->perpetualCheckIllegal || var->materialCounting || var->moveRepetitionIllegal || walling_rule() == DUCK)
+     return false;
+diff --git a/src/position.h b/src/position.h
+index 685c079..f3417bc 100644
+--- a/src/position.h
++++ b/src/position.h
+@@ -56,6 +56,9 @@ struct StateInfo {
+   Square castlingKingSquare[COLOR_NB];
+   Bitboard wallSquares;
+   Bitboard gatesBB[COLOR_NB];
++  Bitboard virginPawns;
++  PieceType pirReviveType;
++  Square pirReviveSquare;
+ 
+   // Not copied when making a move (will be recomputed anyhow)
+   Key        key;
+@@ -68,6 +71,8 @@ struct StateInfo {
+   Bitboard   blockersForKing[COLOR_NB];
+   Bitboard   pinners[COLOR_NB];
+   Bitboard   checkSquares[PIECE_TYPE_NB];
++  Piece      pirSwapped;
++  Piece      pirSacrificed;
+   Piece      capturedPiece;
+   Square     captureSquare; // when != to_sq, e.g., en passant
+   Piece      promotionPawn;
+@@ -116,6 +121,18 @@ public:
+   Position& set(const std::string& code, Color c, StateInfo* si);
+   std::string fen(bool sfen = false, bool showPromoted = false, int countStarted = 0, std::string holdings = "-", Bitboard fogArea = 0) const;
+ 
++  bool pirescacs() const { return var->pirescacs; }
++  int pirescacs_version() const { return var->pirescacsVersion; }
++  PieceType pir_captain_type() const { return pirescacs_version() >= 5 ? CUSTOM_PIECE_3 : KING; }
++  Bitboard virgin_pawns() const { return st->virginPawns; }
++  PieceType pir_revival_type() const { return st->pirReviveType; }
++  Square pir_revival_square() const { return st->pirReviveSquare; }
++  Bitboard pir_medics() const;
++  bool pir_legal(Move m) const;
++  bool pir_gives_check(Move m) const;
++  void pir_do_move(Move m, StateInfo& newSt);
++  void pir_undo_move(Move m);
++
+   // Variant rule properties
+   const Variant* variant() const;
+   Rank max_rank() const;
+@@ -1226,7 +1243,7 @@ template<PieceType Pt> inline int Position::count() const {
+ }
+ 
+ template<PieceType Pt> inline Square Position::square(Color c) const {
+-  assert(count<Pt>(c) == 1);
++  assert(count<Pt>(c) == 1 || (pirescacs() && count<Pt>(c) > 0));
+   return lsb(pieces(c, Pt));
+ }
+ 
+@@ -1436,11 +1453,13 @@ inline bool Position::is_chess960() const {
+ 
+ inline bool Position::capture_or_promotion(Move m) const {
+   assert(is_ok(m));
++  if (pirescacs()) return type_of(m) == PIR_RETURN || type_of(m) == PIR_REVIVE || capture(m) || (type_of(moved_piece(m)) == ROOK && relative_rank(sideToMove, to_sq(m)) == RANK_8);
+   return type_of(m) == PROMOTION || type_of(m) == EN_PASSANT || (type_of(m) != CASTLING && !empty(to_sq(m)));
+ }
+ 
+ inline bool Position::capture(Move m) const {
+   assert(is_ok(m));
++  if (type_of(m) == PIR_SWAP) return false;
+   // Castling is encoded as "king captures rook"
+   return (!empty(to_sq(m)) && type_of(m) != CASTLING && from_sq(m) != to_sq(m)) || type_of(m) == EN_PASSANT;
+ }
+diff --git a/src/search.cpp b/src/search.cpp
+index 4b19e5f..ae81acf 100644
+--- a/src/search.cpp
++++ b/src/search.cpp
+@@ -933,7 +933,8 @@ namespace {
+         return eval;
+ 
+     // Step 8. Null move search with verification search (~40 Elo)
+-    if (   !PvNode
++    if (   !pos.pirescacs()
++        && !PvNode
+         && (ss-1)->currentMove != MOVE_NULL
+         && (ss-1)->statScore < 23767
+         &&  eval >= beta
+@@ -1648,7 +1649,8 @@ moves_loop: // When in check, search starts from here
+       moveCount++;
+ 
+       // Futility pruning and moveCount pruning
+-      if (    bestValue > VALUE_TB_LOSS_IN_MAX_PLY
++      if (    !pos.pirescacs()
++          && bestValue > VALUE_TB_LOSS_IN_MAX_PLY
+           && !givesCheck
+           && !(   pos.extinction_value() == -VALUE_MATE
+                && pos.piece_on(to_sq(move))
+diff --git a/src/thread.cpp b/src/thread.cpp
+index 32aaf58..88c345c 100644
+--- a/src/thread.cpp
++++ b/src/thread.cpp
+@@ -36,10 +36,11 @@ ThreadPool Threads; // Global object
+ /// Thread constructor launches the thread and waits until it goes to sleep
+ /// in idle_loop(). Note that 'searching' and 'exit' should be already set.
+ 
+-Thread::Thread(size_t n) : idx(n), stdThread(&Thread::idle_loop, this) {
+-
+-  wait_for_search_finished();
+-}
++#ifdef PIR_SINGLE
++Thread::Thread(size_t n) : idx(n) { searching = false; }
++#else
++Thread::Thread(size_t n) : idx(n), stdThread(&Thread::idle_loop, this) { wait_for_search_finished(); }
++#endif
+ 
+ 
+ /// Thread destructor wakes up the thread in idle_loop() and waits
+@@ -49,9 +50,11 @@ Thread::~Thread() {
+ 
+   assert(!searching);
+ 
++  #ifndef PIR_SINGLE
+   exit = true;
+   start_searching();
+   stdThread.join();
++  #endif
+ }
+ 
+ 
+@@ -79,6 +82,9 @@ void Thread::clear() {
+ /// Thread::start_searching() wakes up the thread that will start the search
+ 
+ void Thread::start_searching() {
++  #ifdef PIR_SINGLE
++  searching = true; search(); searching = false; return;
++  #endif
+ 
+   std::lock_guard<std::mutex> lk(mutex);
+   searching = true;
+@@ -90,6 +96,9 @@ void Thread::start_searching() {
+ /// until the thread has finished searching.
+ 
+ void Thread::wait_for_search_finished() {
++  #ifdef PIR_SINGLE
++  return;
++  #endif
+ 
+   std::unique_lock<std::mutex> lk(mutex);
+   cv.wait(lk, [&]{ return !searching; });
+diff --git a/src/thread.h b/src/thread.h
+index 464be79..82695fe 100644
+--- a/src/thread.h
++++ b/src/thread.h
+@@ -45,7 +45,9 @@ class Thread {
+   std::condition_variable cv;
+   size_t idx;
+   bool exit = false, searching = true; // Set before starting std::thread
++  #ifndef PIR_SINGLE
+   NativeThread stdThread;
++  #endif
+ 
+ public:
+   explicit Thread(size_t);
+diff --git a/src/tt.cpp b/src/tt.cpp
+index 468e001..73cd856 100644
+--- a/src/tt.cpp
++++ b/src/tt.cpp
+@@ -84,6 +84,9 @@ void TranspositionTable::resize(size_t mbSize) {
+ //  in a multi-threaded way.
+ 
+ void TranspositionTable::clear() {
++  #ifdef PIR_SINGLE
++  std::memset(table, 0, clusterCount * sizeof(Cluster)); return;
++  #endif
+   #ifdef __EMSCRIPTEN__
+   // NOTE: Sometimes threaded TT initialization seems to fail (engine crash on startup), so here we simply initialize on main thread.
+   std::memset(table, 0, clusterCount * sizeof(Cluster));
+diff --git a/src/types.h b/src/types.h
+index 844d195..2a763db 100644
+--- a/src/types.h
++++ b/src/types.h
+@@ -239,7 +239,7 @@ constexpr int MAX_PLY = 60;
+ #endif
+ /// endif USE_HEAP_INSTEAD_OF_STACK_FOR_MOVE_LIST
+ #else
+-constexpr int MAX_MOVES = 1024;
++constexpr int MAX_MOVES = 4096; // Also covers densely populated edited Pirescacs positions.
+ constexpr int MAX_PLY = 246;
+ #endif
+ /// endif ALLVARS
+@@ -270,6 +270,9 @@ enum MoveType : int {
+   PIECE_PROMOTION    = 5 << (2 * SQUARE_BITS),
+   PIECE_DEMOTION     = 6 << (2 * SQUARE_BITS),
+   SPECIAL            = 7 << (2 * SQUARE_BITS),
++  PIR_RETURN         = 8 << (2 * SQUARE_BITS),
++  PIR_SWAP           = 9 << (2 * SQUARE_BITS),
++  PIR_REVIVE         = 10 << (2 * SQUARE_BITS),
+ };
+ 
+ constexpr int MOVE_TYPE_BITS = 4;
+@@ -858,7 +861,7 @@ inline bool is_custom(PieceType pt) {
+ }
+ 
+ inline bool is_ok(Move m) {
+-  return from_sq(m) != to_sq(m) || type_of(m) == PROMOTION || type_of(m) == SPECIAL; // Catch MOVE_NULL and MOVE_NONE
++  return from_sq(m) != to_sq(m) || type_of(m) == PROMOTION || type_of(m) == SPECIAL || type_of(m) == PIR_REVIVE; // Catch MOVE_NULL and MOVE_NONE
+ }
+ 
+ inline int dist(Direction d) {
+diff --git a/src/uci.cpp b/src/uci.cpp
+index 6dd0aa7..f72701e 100644
+--- a/src/uci.cpp
++++ b/src/uci.cpp
+@@ -22,8 +22,10 @@
+ #include <iostream>
+ #include <sstream>
+ #include <string>
++#include <regex>
+ 
+ #include "evaluate.h"
++#include "apiutil.h"
+ #include "movegen.h"
+ #include "position.h"
+ #include "search.h"
+@@ -47,6 +49,8 @@ extern vector<string> setup_bench(const Position&, istream&);
+ 
+ namespace {
+ 
++  bool positionError = false;
++
+   // position() is called when engine receives the "position" UCI command.
+   // The function sets up the position described in the given FEN string ("fen")
+   // or the starting position ("startpos") and then makes the moves given in the
+@@ -55,6 +59,7 @@ namespace {
+   void position(Position& pos, istringstream& is, StateListPtr& states) {
+ 
+     Move m;
++    positionError = false;
+     string token, fen;
+ 
+     is >> token;
+@@ -72,12 +77,47 @@ namespace {
+     else
+         return;
+ 
++    const Variant* variant = variants.find(Options["UCI_Variant"])->second;
++    if (variant->pirescacs) {
++        // Free editor: validate encoding and geometry, never material or royal counts.
++        istringstream fields(fen); vector<string> parts; string part;
++        while (fields >> part) parts.push_back(part);
++        bool ok = parts.size() >= 6 && parts.size() <= 8;
++        if (ok) {
++            ok = (parts[1] == "w" || parts[1] == "b") && parts[2] == "-"
++              && regex_match(parts[3], regex(variant->pirescacsVersion >= 4 ? "(-|[a-h][36])" : "-"))
++              && regex_match(parts[4], regex("[0-9]{1,6}")) && regex_match(parts[5], regex("[1-9][0-9]{0,5}"));
++            int files = 0, ranks = 1;
++            string alphabet = variant->pirescacsVersion >= 5 ? "PNBRKMCpnbrkmc" : variant->pirescacsVersion >= 4 ? "PNBRKMpnbrkm" : "PNBRKpnbrk";
++            for (char ch : parts[0]) {
++                if (ch == '/') { if (files != 8) ok = false; files = 0; ++ranks; }
++                else if (ch >= '1' && ch <= '8') files += ch - '0';
++                else if (alphabet.find(ch) != string::npos) ++files;
++                else ok = false;
++            }
++            ok = ok && files == 8 && ranks == 8;
++            bool virgin = false, revival = false;
++            for (size_t i = 6; i < parts.size(); ++i) {
++                if (regex_match(parts[i], regex("v:[0-9a-fA-F]{1,16}")) && !virgin) virgin = true;
++                else if (variant->pirescacsVersion >= 4 && regex_match(parts[i], regex(variant->pirescacsVersion >= 5 ? "r:[PNBMCpnbmc]@[a-h][1-8]" : "r:[PNBMpnbm]@[a-h][1-8]")) && !revival) {
++                    revival = true;
++                    if (bool(isupper(parts[i][2])) != (parts[1] == "w")) ok = false;
++                } else ok = false;
++            }
++            if (variant->pirescacsVersion < 4) {
++                string base; for (size_t i = 0; i < 6; ++i) base += parts[i] + " ";
++                ok = ok && FEN::validate_fen(base, variant, false) == FEN::FEN_OK;
++            }
++        }
++        if (!ok) { positionError = true; return; }
++    }
+     states = StateListPtr(new std::deque<StateInfo>(1)); // Drop old and create a new one
+     pos.set(variants.find(Options["UCI_Variant"])->second, fen, Options["UCI_Chess960"], &states->back(), Threads.main(), sfen);
+ 
+     // Parse move list (if any)
+-    while (is >> token && (m = UCI::to_move(pos, token)) != MOVE_NONE)
+-    {
++    while (is >> token) {
++        m = UCI::to_move(pos, token);
++        if (m == MOVE_NONE) { positionError = true; break; }
+         states->emplace_back();
+         pos.do_move(m, states->back());
+     }
+@@ -399,11 +439,49 @@ void UCI::loop(int argc, char* argv[]) {
+       else if (token == "position")   position(pos, is, states), banmoves.clear();
+       else if (token == "ucinewgame" || token == "usinewgame" || token == "uccinewgame") Search::clear();
+       else if (token == "isready")    sync_cout << "readyok" << sync_endl;
++      else if (token == "validate" && pos.pirescacs() && pos.pirescacs_version() < 4) {
++          // Edited positions must be possible final states; the non-moving captain is safe.
++          if (pos.attackers_to(pos.square<KING>(~pos.side_to_move()), pos.side_to_move())) positionError = true;
++          for (Color c : {WHITE, BLACK}) {
++              if (pos.count(c, ROOK) > 1 || pos.count(c, BISHOP) > 2 || pos.count(c, CUSTOM_PIECE_1) > 2
++                  || pos.count(c, PAWN) > 7
++                  || (pos.pieces(c, PAWN) & (c == WHITE ? Rank8BB : Rank1BB))) positionError = true;
++          }
++      }
+ 
+       // Additional custom non-UCI commands, mainly for debugging.
+       // Do not use these commands during a search!
+       else if (token == "flip")     pos.flip();
+       else if (token == "bench")    bench(pos, is, states);
++      else if (token == "snapshot") {
++          auto moves = MoveList<LEGAL>(pos);
++          std::string reason = "", result = "*";
++          Value outcome;
++          if (pos.is_immediate_game_end(outcome)) reason = "arrival";
++          else if (moves.size() == 0) { outcome = pos.checkers() ? pos.checkmate_value() : pos.stalemate_value(); reason = pos.checkers() ? "mate" : "stalemate"; }
++          else if (pos.is_optional_game_end(outcome, 0)) reason = pos.rule50_count() >= 100 ? "fifty" : "repetition";
++          if (!reason.empty()) {
++              if (outcome == VALUE_DRAW) result = "1/2-1/2";
++              else result = ((outcome > 0) == (pos.side_to_move() == WHITE)) ? "1-0" : "0-1";
++          }
++          sync_cout << "snapshot {\"fen\":\"" << pos.fen() << "\",\"turn\":\"" << (pos.side_to_move() == WHITE ? "white" : "black")
++                    << "\",\"check\":" << (pos.checkers() ? "true" : "false") << ",\"error\":" << (positionError ? "true" : "false")
++                    << ",\"result\":\"" << result << "\",\"reason\":\"" << reason << "\",\"legal\":[";
++          bool first = true;
++          for (const auto& m : moves) { if (!first) std::cout << ','; first = false; std::cout << '\"' << UCI::move(pos, m) << '\"'; }
++          std::cout << "]";
++          if (pos.pirescacs() && pos.pir_revival_type() != NO_PIECE_TYPE) {
++              std::cout << ",\"revival\":{\"piece\":\"" << pos.piece_to_char()[make_piece(pos.side_to_move(), pos.pir_revival_type())]
++                        << "\",\"capturedAt\":\"" << UCI::square(pos, pos.pir_revival_square()) << "\",\"medics\":[";
++              bool firstMedic = true;
++              for (const auto& m : moves) if (type_of(m) == PIR_REVIVE) {
++                  if (!firstMedic) std::cout << ',';
++                  firstMedic = false; std::cout << '\"' << UCI::square(pos, from_sq(m)) << '\"';
++              }
++              std::cout << "]}";
++          }
++          std::cout << "}" << sync_endl;
++      }
+       else if (token == "d")        sync_cout << pos << sync_endl;
+       else if (token == "eval")     trace_eval(pos);
+       else if (token == "compiler") sync_cout << compiler_info() << sync_endl;
+@@ -559,6 +637,9 @@ string UCI::move(const Position& pos, Move m) {
+   string move = (type_of(m) == DROP ? UCI::dropped_piece(pos, m) + (CurrentProtocol == USI ? '*' : '@')
+                                     : UCI::square(pos, from)) + UCI::square(pos, to);
+ 
++  if (type_of(m) == PIR_RETURN) move += "@" + UCI::square(pos, gating_square(m));
++  if (type_of(m) == PIR_REVIVE) move += "!";
++
+   // Wall square
+   if (pos.walling() && CurrentProtocol == XBOARD)
+       move += "," + UCI::square(pos, to) + UCI::square(pos, gating_square(m));
+diff --git a/src/variant.cpp b/src/variant.cpp
+index 9ec8c49..80478e6 100644
+--- a/src/variant.cpp
++++ b/src/variant.cpp
+@@ -43,6 +43,41 @@ namespace {
+         v->pieceToCharTable = "PNBRQ................Kpnbrq................k";
+         return v;
+     }
++    // v3: new initial position. v2: B musician; N carpenter (sixteen ring-2 leaps).
++    // Keep v1 for existing games: B carpenter and forward-only N musician.
++    Variant* pirescacs_variant(int version = 5) {
++        Variant* v = chess_variant_base()->init();
++        v->pirescacs = true;
++        v->pirescacsVersion = version;
++        v->pieceToCharTable = version >= 5
++            ? "PNBRM..C.............Kpnbrm..c.............k"
++            : version >= 4 ? "PNBRM................Kpnbrm................k"
++            : "PNBR.................Kpnbr.................k";
++        v->remove_piece(QUEEN);
++        v->remove_piece(KNIGHT);
++        v->add_piece(CUSTOM_PIECE_1, 'n', version == 1 ? "fhNfAfDsD" : "NAD");
++        if (version >= 4) v->add_piece(COMMONER, 'm');
++        if (version >= 5) {
++            // The captain is an ordinary queen-moving piece, never a royal.
++            v->remove_piece(KING);
++            v->add_piece(CUSTOM_PIECE_2, 'c', "R");
++            v->add_piece(CUSTOM_PIECE_3, 'k', "Q");
++        }
++        v->kingType = QUEEN;
++        v->castling = false;
++        v->enPassantTypes[WHITE] = v->enPassantTypes[BLACK] = version >= 4 ? piece_set(PAWN) : NO_PIECE_SET;
++        v->promotionPieceTypes[WHITE] = v->promotionPieceTypes[BLACK] = NO_PIECE_SET;
++        v->flagPiece[WHITE] = v->flagPiece[BLACK] = ROOK;
++        v->flagRegion[WHITE] = Rank8BB;
++        v->flagRegion[BLACK] = Rank1BB;
++        v->startFen = version <= 2
++            ? "1rb1nbn1/p1pppkpp/5p2/8/8/2P5/PPKPPP1P/1NBN1BR1 w - - 0 1"
++            : version == 3 ? "2bknbn1/prpppppp/8/8/8/8/PPPPPPRP/1NBNKB2 w - - 0 1"
++            : version == 4 ? "1mbknbm1/prpppppp/8/8/8/8/PPPPPPRP/1MBNKBM1 w - - 0 1"
++            : "cmbknbmc/prpppppr/8/8/8/8/RPPPPPRP/CMBNKBMC w - - 0 1";
++        v->nnueAlias = "";
++        return v;
++    }
+     // Standard chess
+     // https://en.wikipedia.org/wiki/Chess
+     Variant* chess_variant() {
+@@ -1846,6 +1881,12 @@ namespace {
+ 
+ void VariantMap::init() {
+     // Add to UCI_Variant option
++    add("pirescacs", pirescacs_variant());
++    add("pirescacs-v1", pirescacs_variant(1));
++    add("pirescacs-v2", pirescacs_variant(2));
++    add("pirescacs-v3", pirescacs_variant(3));
++    add("pirescacs-v4", pirescacs_variant(4));
++    add("pirescacs-v5", pirescacs_variant(5));
+     add("chess", chess_variant());
+     add("normal", chess_variant());
+     add("fischerandom", chess960_variant());
+diff --git a/src/variant.h b/src/variant.h
+index 0e6d44c..2de3fa2 100644
+--- a/src/variant.h
++++ b/src/variant.h
+@@ -85,6 +85,8 @@ struct Variant {
+   PieceSet castlingRookPieces[COLOR_NB] = {piece_set(ROOK), piece_set(ROOK)};
+   bool oppositeCastling = false;
+   PieceType kingType = KING;
++  bool pirescacs = false;
++  int pirescacsVersion = 0;
+   bool checking = true;
+   bool dropChecks = true;
+   bool mustCapture = false;
+diff --git a/src/emscripten/pir-single.js b/src/emscripten/pir-single.js
+new file mode 100644
+index 0000000..489a122
+--- /dev/null
++++ b/src/emscripten/pir-single.js
+@@ -0,0 +1,11 @@
++class PirQueue {
++  constructor() { this.list = []; this.waiter = null; }
++  get() { if (this.list.length) return Promise.resolve(this.list.shift()); return new Promise(resolve => { this.waiter = resolve; }); }
++  put(x) { if (this.waiter) { const w = this.waiter; this.waiter = null; w(x); } else this.list.push(x); }
++}
++Module['queue'] = new PirQueue();
++Module['postMessage'] = data => Module['queue'].put(data);
++const pirListeners = [];
++Module['addMessageListener'] = cb => pirListeners.push(cb);
++Module['print'] = data => pirListeners.forEach(cb => cb(data));
++Module['printErr'] = data => pirListeners.forEach(cb => cb(data));
+diff --git a/src/pirescacs.ini b/src/pirescacs.ini
+new file mode 100644
+index 0000000..bfa211c
+--- /dev/null
++++ b/src/pirescacs.ini
+@@ -0,0 +1 @@
++[pirescacs-validation:pirescacs]

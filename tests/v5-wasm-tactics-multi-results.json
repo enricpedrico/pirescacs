@@ -1,0 +1,154 @@
+{
+  "mode": "multi",
+  "engine": "pirescacs-fairy-1.5.0",
+  "variant": "pirescacs-v5",
+  "budgetMs": 10000,
+  "passed": 24,
+  "total": 24,
+  "results": [
+    {
+      "name": "arrival-now-white",
+      "best": "c7c8",
+      "passed": true,
+      "wallMs": 19
+    },
+    {
+      "name": "arrival-now-black",
+      "best": "f2f1",
+      "passed": true,
+      "wallMs": 12
+    },
+    {
+      "name": "arrival-swaps-chef-white",
+      "best": "c7c8",
+      "passed": true,
+      "wallMs": 14
+    },
+    {
+      "name": "arrival-swaps-chef-black",
+      "best": "f2f1",
+      "passed": true,
+      "wallMs": 12
+    },
+    {
+      "name": "arrival-while-captain-attacked-white",
+      "best": "c7c8",
+      "passed": true,
+      "wallMs": 13
+    },
+    {
+      "name": "arrival-while-captain-attacked-black",
+      "best": "f2f1",
+      "passed": true,
+      "wallMs": 9
+    },
+    {
+      "name": "second-ship-wins-white",
+      "best": "a7a8",
+      "passed": true,
+      "wallMs": 6
+    },
+    {
+      "name": "second-ship-wins-black",
+      "best": "h2h1",
+      "passed": true,
+      "wallMs": 6
+    },
+    {
+      "name": "chef-must-block-white",
+      "best": "d1f1",
+      "passed": true,
+      "wallMs": 8
+    },
+    {
+      "name": "chef-must-block-black",
+      "best": "e8c8",
+      "passed": true,
+      "wallMs": 8
+    },
+    {
+      "name": "chef-removes-blocker-white",
+      "best": "a8c8",
+      "passed": true,
+      "wallMs": 7
+    },
+    {
+      "name": "chef-removes-blocker-black",
+      "best": "h1f1",
+      "passed": true,
+      "wallMs": 7
+    },
+    {
+      "name": "doctor-revives-chef-to-clear-route-white",
+      "best": "f8f8!",
+      "passed": true,
+      "wallMs": 10
+    },
+    {
+      "name": "doctor-revives-chef-to-clear-route-black",
+      "best": "c1c1!",
+      "passed": true,
+      "wallMs": 10
+    },
+    {
+      "name": "return-must-block-white",
+      "best": "d7e8@f1",
+      "passed": true,
+      "wallMs": 43
+    },
+    {
+      "name": "return-must-block-black",
+      "best": "e2d1@c8",
+      "passed": true,
+      "wallMs": 55
+    },
+    {
+      "name": "captain-must-block-white",
+      "best": "a1f1",
+      "passed": true,
+      "wallMs": 8
+    },
+    {
+      "name": "captain-must-block-black",
+      "best": "h8c8",
+      "passed": true,
+      "wallMs": 8
+    },
+    {
+      "name": "carpenter-must-block-white",
+      "best": "d1f1",
+      "passed": true,
+      "wallMs": 7
+    },
+    {
+      "name": "carpenter-must-block-black",
+      "best": "e8c8",
+      "passed": true,
+      "wallMs": 7
+    },
+    {
+      "name": "musician-must-block-white",
+      "best": "b5f1",
+      "passed": true,
+      "wallMs": 7
+    },
+    {
+      "name": "musician-must-block-black",
+      "best": "g4c8",
+      "passed": true,
+      "wallMs": 7
+    },
+    {
+      "name": "sail-five-plies-white",
+      "best": "c5c6",
+      "passed": true,
+      "wallMs": 8
+    },
+    {
+      "name": "sail-five-plies-black",
+      "best": "f4f3",
+      "passed": true,
+      "wallMs": 6
+    }
+  ]
+}

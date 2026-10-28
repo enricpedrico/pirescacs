@@ -1,0 +1,208 @@
+{
+  "engine": "pirescacs-fairy-1.0.0",
+  "budgetMs": 10000,
+  "referenceProof": true,
+  "seconds": 69.92,
+  "passed": 16,
+  "total": 16,
+  "cases": [
+    {
+      "name": "arrival-now-white",
+      "fen": "5r2/2R4k/8/8/8/8/8/K7 w - - 0 1 v:0",
+      "kind": "win",
+      "proofPlies": 1,
+      "solutions": [
+        "c7c8"
+      ],
+      "best": "c7c8",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 2 multipv 1 score mate 1 nodes 4410 nps 735000 tbhits 0 time 6 pv c7c8"
+    },
+    {
+      "name": "arrival-now-black",
+      "fen": "7k/8/8/8/8/8/K4r2/2R5 b - - 0 1 v:0",
+      "kind": "win",
+      "proofPlies": 1,
+      "solutions": [
+        "f2f1"
+      ],
+      "best": "f2f1",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 2 multipv 1 score mate 1 nodes 4410 nps 882000 tbhits 0 time 5 pv f2f1"
+    },
+    {
+      "name": "arrival-by-captain-swap-white",
+      "fen": "2K2r2/2R5/8/7k/8/8/8/8 w - - 0 1 v:0",
+      "kind": "win",
+      "proofPlies": 1,
+      "solutions": [
+        "c7c8"
+      ],
+      "best": "c7c8",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 2 multipv 1 score mate 1 nodes 1960 nps 653333 tbhits 0 time 3 pv c7c8"
+    },
+    {
+      "name": "arrival-by-captain-swap-black",
+      "fen": "8/8/8/8/K7/8/5r2/2R2k2 b - - 0 1 v:0",
+      "kind": "win",
+      "proofPlies": 1,
+      "solutions": [
+        "f2f1"
+      ],
+      "best": "f2f1",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 2 multipv 1 score mate 1 nodes 1960 nps 653333 tbhits 0 time 3 pv f2f1"
+    },
+    {
+      "name": "mate-now-white",
+      "fen": "8/3r3k/4BK1N/P7/R7/8/8/8 w - - 0 1 v:0",
+      "kind": "win",
+      "proofPlies": 1,
+      "solutions": [
+        "e6f5"
+      ],
+      "best": "e6f5",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 2 multipv 1 score mate 1 nodes 6862 nps 980285 tbhits 0 time 7 pv e6f5"
+    },
+    {
+      "name": "mate-now-black",
+      "fen": "8/8/8/7r/7p/n1kb4/K3R3/8 b - - 0 1 v:0",
+      "kind": "win",
+      "proofPlies": 1,
+      "solutions": [
+        "d3c4"
+      ],
+      "best": "d3c4",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 2 multipv 1 score mate 1 nodes 6863 nps 980428 tbhits 0 time 7 pv d3c4"
+    },
+    {
+      "name": "protected-sail-five-white",
+      "fen": "5r2/1B5k/1B6/2RN4/8/8/8/K7 w - - 0 1 v:0",
+      "kind": "win",
+      "proofPlies": 5,
+      "solutions": [
+        "c5c6"
+      ],
+      "best": "c5c6",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 6 multipv 1 score mate 3 nodes 400262 nps 479930 tbhits 0 time 834 pv c5c6 f8f7 c6c7 h7h5 c7c8"
+    },
+    {
+      "name": "protected-sail-five-black",
+      "fen": "7k/8/8/8/4nr2/6b1/K5b1/2R5 b - - 0 1 v:0",
+      "kind": "win",
+      "proofPlies": 5,
+      "solutions": [
+        "f4f3"
+      ],
+      "best": "f4f3",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 6 multipv 1 score mate 3 nodes 411652 nps 405568 hashfull 0 tbhits 0 time 1015 pv f4f3 a2a6 f3f2 c1c2 f2f1"
+    },
+    {
+      "name": "captain-must-block-white",
+      "fen": "8/7k/8/8/8/8/5r2/R3K3 w - - 0 1 v:0",
+      "kind": "defense",
+      "proofPlies": 2,
+      "solutions": [
+        "e1f1"
+      ],
+      "best": "e1f1",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 7 multipv 1 score mate -3 nodes 100977 nps 759225 tbhits 0 time 133 pv e1f1 h7e7 a1a2 e7a3 f1a1 f2f1"
+    },
+    {
+      "name": "captain-must-block-black",
+      "fen": "3k3r/2R5/8/8/8/8/K7/8 b - - 0 1 v:0",
+      "kind": "defense",
+      "proofPlies": 2,
+      "solutions": [
+        "d8c8"
+      ],
+      "best": "d8c8",
+      "passed": true,
+      "finalInfo": "info depth 245 seldepth 7 multipv 1 score mate -3 nodes 101797 nps 754051 tbhits 0 time 135 pv d8c8 a2d2 h8h7 d2h6 c8b7 c7c8"
+    },
+    {
+      "name": "musician-must-block-white",
+      "fen": "8/7k/8/8/8/8/5r2/KR1N4 w - - 0 1 v:0",
+      "kind": "defense",
+      "proofPlies": 2,
+      "solutions": [
+        "d1f1"
+      ],
+      "best": "d1f1",
+      "passed": true,
+      "finalInfo": "info depth 45 seldepth 26 multipv 1 score mate 13 nodes 4238738 nps 423831 hashfull 140 tbhits 0 time 10001 pv d1f1 h7c2 b1b2 c2c3 a1b1 c3b3 f1d3 b3c4 b1f1 c4a4 b2b3 a4d4 b3b4 d4c3 b4b5 c3g7 b5b6 g7b7 d3c5 b7c8 b6b7 c8b8 c5d7 b8a7 b7b8"
+    },
+    {
+      "name": "musician-must-block-black",
+      "fen": "4n1rk/2R5/8/8/8/8/K7/8 b - - 0 1 v:0",
+      "kind": "defense",
+      "proofPlies": 2,
+      "solutions": [
+        "e8c8"
+      ],
+      "best": "e8c8",
+      "passed": true,
+      "finalInfo": "info depth 37 seldepth 28 multipv 1 score mate 14 nodes 3906319 nps 390514 hashfull 110 tbhits 0 time 10003 pv e8c8 a2f2 g8g7 f2f6 h8e8 f6h4 g7g6 h4h5 e8g8 h5g5 g8h8 g5f5 g6g5 f5g4 h8e8 g4g2 g5g4 g2d2 g4g3 d2g2 e8f8 g2h2 g3g2 h2g1 f8h8 g1f1 g2g1"
+    },
+    {
+      "name": "carpenter-must-block-white",
+      "fen": "8/7k/8/1B6/8/8/5r2/KR6 w - - 0 1 v:0",
+      "kind": "defense",
+      "proofPlies": 2,
+      "solutions": [
+        "b5d3",
+        "b5f1"
+      ],
+      "best": "b5f1",
+      "passed": true,
+      "finalInfo": "info depth 48 seldepth 24 multipv 1 score mate 12 nodes 4813277 nps 481231 hashfull 112 tbhits 0 time 10002 pv b5f1 h7c7 b1b2 c7c3 a1d1 c3b4 b2b3 b4a4 d1b1 a4b4 b1c1 b4a4 b3b4 a4a5 b4b5 a5b6 c1c8 b6h6 b5b6 h6h2 b6b7 h2h6 b7b8"
+    },
+    {
+      "name": "carpenter-must-block-black",
+      "fen": "6rk/2R5/8/8/6b1/8/K7/8 b - - 0 1 v:0",
+      "kind": "defense",
+      "proofPlies": 2,
+      "solutions": [
+        "g4c8",
+        "g4e6"
+      ],
+      "best": "g4c8",
+      "passed": true,
+      "finalInfo": "info depth 44 seldepth 24 multipv 1 score mate 12 nodes 5089606 nps 508909 hashfull 88 tbhits 0 time 10001 pv g4c8 a2f7 g8g7 f7f6 h8e8 f6h6 g7g6 h6h5 e8d8 h5h1 g6g5 h1h4 d8f8 h4h1 g5g4 h1e4 g4g3 e4g2 f8c5 g2h1 g3g2 h1h8 g2g1"
+    },
+    {
+      "name": "return-must-block-white",
+      "fen": "5r2/3P2b1/7k/8/8/8/R7/KB6 w - - 0 1 v:0",
+      "kind": "legal-return",
+      "proofPlies": 1,
+      "solutions": [
+        "d7d8@b2",
+        "d7d8@c3",
+        "d7d8@d4"
+      ],
+      "best": "d7d8@b2",
+      "passed": true,
+      "finalInfo": "info depth 24 seldepth 29 multipv 1 score cp 7 nodes 3715191 nps 371407 hashfull 880 tbhits 0 time 10003 pv d7d8@b2 h6c1 a2a3 g7b2 a1a2 b2c3 b1f5 c3a5 a2f7 c1f4 f7d5 f4b4 d5e5 b4d2 f5c8 a5c3 e5f5 f8f7 c8d7 c3a5 d7a4 a5b4 a4b5 d2c3 b5d7 b4a5 d7b5 a5c7 b5f1"
+    },
+    {
+      "name": "return-must-block-black",
+      "fen": "6bk/7r/8/8/8/K7/1B2p3/2R5 b - - 0 1 v:0",
+      "kind": "legal-return",
+      "proofPlies": 1,
+      "solutions": [
+        "e2e1@e5",
+        "e2e1@f6",
+        "e2e1@g7"
+      ],
+      "best": "e2e1@g7",
+      "passed": true,
+      "finalInfo": "info depth 23 seldepth 33 multipv 1 score cp 11 nodes 3678446 nps 367807 hashfull 870 tbhits 0 time 10001 pv e2e1@g7 a3f8 h7h6 b2g7 h8h7 g7f6 h7f5 f8d8 g8f7 c1c2 f5g4 f6g5 f7g6 d8f6 g6d3 g5h4 g4e4 f6f2 d3e2 h4f6 e2h5 f6g5 h5d1 f2f1 e4g4"
+    }
+  ]
+}

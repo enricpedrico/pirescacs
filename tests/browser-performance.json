@@ -1,0 +1,29 @@
+{
+  "browser": "Codex IAB Chromium",
+  "device": "Intel Core i7-13700KF, Ubuntu 24.04",
+  "samples": [
+    17.85,
+    20.84,
+    24.505,
+    24.91,
+    20.555,
+    18.385,
+    22.42,
+    19.415,
+    19.515,
+    20.485,
+    20.595,
+    19.415,
+    19.14,
+    20.345,
+    20.225,
+    20.6,
+    20.025,
+    20.52,
+    23.11,
+    20.755
+  ],
+  "p95Ms": 24.505,
+  "measure": "Legal move commit to authoritative Chessground update and next requestAnimationFrame; development build",
+  "mainThreadSearch": false
+}

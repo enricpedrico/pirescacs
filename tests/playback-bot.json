@@ -1,0 +1,20 @@
+{
+  "format": "pirescacs",
+  "formatVersion": 1,
+  "rulesVersion": "pirescacs-v3",
+  "id": "playback-bot-fixture",
+  "created": 1791417600000,
+  "updated": 1791417600000,
+  "moves": [
+    "g2g3",
+    "b7b6",
+    "g3g4",
+    "b6b5"
+  ],
+  "annotations": {},
+  "analyses": {},
+  "variations": [],
+  "mode": "bot",
+  "player": "black",
+  "level": 3
+}

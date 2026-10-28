@@ -1,0 +1,130 @@
+{
+  "mode": "multi",
+  "engine": "pirescacs-fairy-1.4.0",
+  "variant": "pirescacs-v4",
+  "budgetMs": 10000,
+  "passed": 20,
+  "total": 20,
+  "results": [
+    {
+      "name": "doctor-revival-mate-white",
+      "best": "f5f5!",
+      "passed": true,
+      "wallMs": 30
+    },
+    {
+      "name": "doctor-revival-mate-black",
+      "best": "c4c4!",
+      "passed": true,
+      "wallMs": 17
+    },
+    {
+      "name": "doctor-must-block-white",
+      "best": "e1f1",
+      "passed": true,
+      "wallMs": 10004
+    },
+    {
+      "name": "doctor-must-block-black",
+      "best": "d8c8",
+      "passed": true,
+      "wallMs": 10009
+    },
+    {
+      "name": "arrival-now-white",
+      "best": "c7c8",
+      "passed": true,
+      "wallMs": 9
+    },
+    {
+      "name": "arrival-now-black",
+      "best": "f2f1",
+      "passed": true,
+      "wallMs": 10
+    },
+    {
+      "name": "arrival-by-captain-swap-white",
+      "best": "c7c8",
+      "passed": true,
+      "wallMs": 8
+    },
+    {
+      "name": "arrival-by-captain-swap-black",
+      "best": "f2f1",
+      "passed": true,
+      "wallMs": 8
+    },
+    {
+      "name": "mate-now-white",
+      "best": "e6f5",
+      "passed": true,
+      "wallMs": 12
+    },
+    {
+      "name": "mate-now-black",
+      "best": "d3c4",
+      "passed": true,
+      "wallMs": 11
+    },
+    {
+      "name": "protected-sail-five-white",
+      "best": "c5c6",
+      "passed": true,
+      "wallMs": 332
+    },
+    {
+      "name": "protected-sail-five-black",
+      "best": "f4f3",
+      "passed": true,
+      "wallMs": 299
+    },
+    {
+      "name": "captain-must-block-white",
+      "best": "e1f1",
+      "passed": true,
+      "wallMs": 54
+    },
+    {
+      "name": "captain-must-block-black",
+      "best": "d8c8",
+      "passed": true,
+      "wallMs": 57
+    },
+    {
+      "name": "carpenter-must-block-white",
+      "best": "d1f1",
+      "passed": true,
+      "wallMs": 10003
+    },
+    {
+      "name": "carpenter-must-block-black",
+      "best": "e8c8",
+      "passed": true,
+      "wallMs": 10005
+    },
+    {
+      "name": "musician-must-block-white",
+      "best": "b5f1",
+      "passed": true,
+      "wallMs": 10004
+    },
+    {
+      "name": "musician-must-block-black",
+      "best": "g4c8",
+      "passed": true,
+      "wallMs": 10003
+    },
+    {
+      "name": "return-must-block-white",
+      "best": "d7d8@b2",
+      "passed": true,
+      "wallMs": 10004
+    },
+    {
+      "name": "return-must-block-black",
+      "best": "e2e1@g7",
+      "passed": true,
+      "wallMs": 10004
+    }
+  ]
+}
